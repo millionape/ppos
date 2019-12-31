@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Prakob POS</title>
+
+    <link href="../public/stylesheets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="../public/stylesheets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../node_modules/print-js/dist/print.js"></script>
+    <link rel="stylesheet" type="text/css" href="../node_modules/print-js/dist/print.css">
+    <script src="../node_modules/moment/min/moment-with-locales.min.js"></script>
+
+
+
+    <!--Data Table-->
+    <script type="text/javascript" src=" https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src=" https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js">
+    </script>
+
+    <!--Export table buttons-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.1/js/buttons.print.min.js"></script>
+
+    <!--Export table button CSS-->
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
+
+    <script type="text/javascript" src="../public/stylesheets/js/getProduct.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="../public/stylesheets/js/76c4acf77c.js" crossorigin="anonymous"></script>
+    <script src="../public/stylesheets/js/backShopJs.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#ivBarInput").focus();
+            var table = $('#example').DataTable({
+                "paging": true,
+                pageLength: 50,
+                responsive: true,
+                deferRender: true,
+                //"processing": true,
+                //"serverSide": true,
+                "columnDefs": [{
+                    "targets": -1,
+                    "data": null,
+                    "defaultContent": "<button>แก้ไข</button>"
+                }]
+            });
+            $('#example tbody').on('click', 'button', function () {
+                var data = table.row($(this).parents('tr')).data();
+                console.log('clicked at ===>', data);
+                var clickedBarcode = data[0];
+                console.log('clicked data ----->', clickedBarcode);
+                openProductModal(clickedBarcode);
+                //removeItemFromtable(data);
+            });
+            $('#ivBarBtn').click(function () {
+                if ($("#ivBarInput").val().length > 0) {
+                    $('#modalLoad').modal('show');
+                    findbar($('#ivBarInput').val());
+                    $("#ivBarInput").val('');
+                    $("#ivBarInput").focus();
+                } else {
+                    alert('กรุณาใส่บาร์โค๊ด')
+                }
+            });
+            $('#ivBarInput').keypress(function (e) {
+                if (e.which == 13) {
+                    if ($("#ivBarInput").val().length > 0) {
+                        $('#modalLoad').modal('show');
+                        findbar($('#ivBarInput').val());
+                        $("#ivBarInput").val('');
+                        $("#ivBarInput").focus();
+                    } else {
+                        alert('กรุณาใส่บาร์โค๊ด')
+                    }
+                    return false; //<---- Add this line
+                }
+            });
+            $('#ivNameBtn').click(function () {
+                if ($("#ivNameInput").val().length > 0) {
+                    $('#modalLoad').modal('show');
+                    findname($('#ivNameInput').val().toString());
+                } else {
+                    alert('กรุณาใส่ชื่อสินค้า')
+                }
+            });
+            $('#delProduct').click(function(){
+                $('#peditModal').modal('hide');
+                $('#modalSaveLoad').modal('show');
+                delProduct($('#eBar').val());
+            });
+            $('#ivNameInput').keypress(function (e) {
+                if (e.which == 13) {
+                    if ($("#ivNameInput").val().length > 0) {
+                        $('#modalLoad').modal('show');
+                        findname($('#ivNameInput').val().toString());
+                        // $('#modalLoad').modal('hide');
+                    } else {
+                        alert('กรุณาใส่ชื่อสินค้า')
+                    }
+                    return false; //<---- Add this line
+                }
+            });
+            $('#findAllBtn').click(function () {
+                $('#modalLoad').modal('show');
+                findall();
+            });
+            $('#editSave').click(function () {
+                $('#peditModal').modal('hide');
+                saveEditChange();
+            });
+            $('#newpSave').click(function () {
+                // $('#newProductModal').modal('hide');
+                // $('#modalSaveLoad').modal('show');
+                newProductSave();
+            });
+            $('#modalNotfound').on('hidden.bs.modal', function (e) {
+                $("#ivBarInput").focus();
+            });
+            $('#peditModal').on('hidden.bs.modal', function (e) {
+                $("#ivBarInput").focus();
+            });
+            $('#modalLoad').on('hidden.bs.modal', function (e) {
+                $("#ivBarInput").focus();
+            });
+            $('#addNewProduct').click(function () {
+                $('#newProductModal').modal('show');
+            });
+
+
+
+
+        });
+    </script>
+</head>
+
+<body>
+    <!-- modal insert success -->
+    <div class="modal" id="modalInsertSuccess" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="card bg-success border-0 text-light" style="width: 100%; height: 200px;">
+                    <h3 class="modal-title mx-auto text-light" style="margin-top: 90px !important;">บันทึกข้อมูลสำเร็จ
+                    </h3>
+                </div>
+                <div class="modal-footer mx-auto">
+                    <button type="button" class="btn btn-secondary mx-auto" style="width: 100px;"
+                        data-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal save load -->
+    <div class="modal" id="modalSaveLoad" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="card border-0" style="width: 100%; height: 200px; margin-top: 90px !important;">
+                    <h5 class="modal-title mx-auto">กำลังดำเนินการ.....</h5>
+                    <div class="spinner-border mx-auto" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <!-- <h5 class="modal-title mx-auto">**ตรวจสอ**</h5> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- new product modal -->
+    <div class="modal fade" id="newProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1><span class="badge badge-secondary">เพิ่มสินค้าใหม่</span></h1>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">บาร์โค๊ด</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="nBar">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">ชื่อสินค้า</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="nName">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">ราคาทุน</span>
+                        </div>
+                        <input type="number" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="nCost">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">ราคาขาย</span>
+                        </div>
+                        <input type="number" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="nPrice">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">คงเหลือ</span>
+                        </div>
+                        <input type="number" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="nQuantity">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">โปรโมชั่น</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="nPromotion">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">คำอธิบาย</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="nDescription">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="newpSave">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- product modal -->
+    <div class="modal fade" id="peditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">แก้ไขข้อมูลสินค้า</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">บาร์โค๊ด</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="eBar">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">ชื่อสินค้า</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="eName">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">ราคาทุน</span>
+                        </div>
+                        <input type="number" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="eCost">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">ราคาขาย</span>
+                        </div>
+                        <input type="number" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="ePrice">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">คงเหลือ</span>
+                        </div>
+                        <input type="number" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="eQuantity">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">โปรโมชั่น</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="ePromotion">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">วันที่แก้ไขล่าสุด</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="eLastEdit">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">คำอธิบาย</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="eDescription">
+                    </div>
+                </div>
+                <div class="modal-footer" style="width: 100%">
+                    <div class="row" style="width: 100%">
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-danger" id="delProduct">ลบสินค้านี้</button>
+                        </div>
+                        <div class="col-md-3">
+
+                        </div>
+                        <div class="col-md-1">
+
+                        </div>
+                        <div class="col-md-2" style="width: 100%;">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                        </div>
+                        <div class="col-md-2" style="width: 100%;">
+                            <button type="button" class="btn btn-primary" id="editSave">บันทึก</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <div class="modal" id="modalLoad" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="card border-0" style="width: 100%; height: 200px; margin-top: 90px !important;">
+                    <h5 class="modal-title mx-auto">ค้นหา</h5>
+                    <div class="spinner-border mx-auto" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <h5 class="modal-title mx-auto">***อาจใช้เวลานานเมื่อค้นหาสินค้าทั้งหมด***</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="modalNotfound" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="card bg-danger border-0 text-light" style="width: 100%; height: 200px;">
+                    <h3 class="modal-title mx-auto text-light" style="margin-top: 90px !important;">ไม่พบข้อมูล</h3>
+                </div>
+                <div class="modal-footer mx-auto">
+                    <button type="button" class="btn btn-secondary mx-auto" style="width: 100px;"
+                        data-dismiss="modal">ปิด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="errorModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color: red;">เพิ่มข้อมูลไม่สำเร็จ!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h3>ไม่สามารถเพิ่มข้อมูลได้ เนื่องจากมีข้อมูลอยู่แล้ว หรือ ระบบผิดพลาด</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <span class="badge badge-success text-light"><a class="navbar-brand ml-2 text-light"
+                href="/pos?token=f6fdffe48c908deb0f4c3bd36c032e72">PrakobPOS</a></span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <!-- <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li> -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        เมนูอื่นๆ
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">จัดการสินค้าในคลัง</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+    <div class="card">
+        <div class="card-header ">
+            <h2><span class="badge badge-primary">ค้นหาสินค้า</span></h2>
+            <div class="row">
+                <div class="col-md">
+                    <div class="input-group mt-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">บาร์โค๊ด</span>
+                        </div>
+                        <input type="number" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="ivBarInput">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="ivBarBtn">OK</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="input-group mt-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">ชื่อสินค้า</span>
+                        </div>
+                        <input type="text" class="form-control" aria-label="Default"
+                            aria-describedby="inputGroup-sizing-default" id="ivNameInput">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button" id="ivNameBtn">OK</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <button class="btn btn-primary mt-2" type="button" id="findAllBtn">ค้นหาสินค้าทั้งหมด</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-header">
+            <h2><span class="badge badge-primary">เพิ่มสินค้า</span></h2>
+            <div class="row w-100">
+                <div class="col-sm-4 w-100">
+                    <button class="btn btn-warning mt-2 w-100" type="button" id="addNewProduct">เพิ่มสินค้าใหม่</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="card-body">
+            <div class="card bg-secondary mb-3 text-light mx-auto text-center" style="width: 100%; height: 60px;">
+                <h4 id="resultText" class="mx-auto mt-3">ผลลัพธ์การค้นหา :</h4>
+            </div>
+            <table id="example" class="table table-striped table-bordered nowrap mt-3" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>บาร์โค๊ด</th>
+                        <th>สินค้า</th>
+                        <th>จำนวนคงเหลือ</th>
+                        <th>ทุน</th>
+                        <th>ราคาขาย</th>
+                        <th>โปรโมชั่น</th>
+                        <th>วันที่แก้ไขล่าสุด</th>
+                        <th>เพิ่มเติม</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

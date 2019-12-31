@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Prakob POS</title>
+
+  <link href="../public/stylesheets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="../public/stylesheets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../node_modules/print-js/dist/print.js"></script>
+  <link rel="stylesheet" type="text/css" href="../node_modules/print-js/dist/print.css">
+  <script src="../node_modules/moment/min/moment-with-locales.min.js"></script>
+
+
+
+  <!--Data Table-->
+  <script type="text/javascript" src=" https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src=" https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+
+  <!--Export table buttons-->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+  <script type="text/javascript" src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
+  <script type="text/javascript" src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/vfs_fonts.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.1/js/buttons.print.min.js"></script>
+
+  <!--Export table button CSS-->
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
+  
+  <script type="text/javascript" src="../public/stylesheets/js/getProduct.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="../public/stylesheets/js/76c4acf77c.js" crossorigin="anonymous"></script>
+
+  <script>
+    $("input[type='number']").inputSpinner();
+  </script>
+
+  <style>
+    .background-card {
+      height: 100%;
+    }
+
+    .material-icons.md-48 {
+      font-size: 48px;
+    }
+
+    .my-custom-scrollbar {
+      position: relative;
+      height: 300px;
+      overflow: auto;
+    }
+
+    .table-wrapper-scroll-y {
+      display: block;
+    }
+  </style>
+  <script>
+    //$("#wrapper").toggleClass("hide");
+
+    $(document).ready(function () {
+      $("#barcodeInput").focus();
+      var table = $('#example').DataTable({
+        responsive: true,
+        "columnDefs": [{
+          "targets": -1,
+          "data": null,
+          "defaultContent": "<button>แก้ไข</button>"
+        }]
+      });
+      // $('#modal1close').click(function(){
+      //   $('#modalNotfound').modal('hide');
+      // });
+      $('#modalNotfound').on('hidden.bs.modal', function (e) {
+        $("#barcodeInput").focus();
+      })
+      $('#example tbody').on('click', 'button', function () {
+        var data = table.row($(this).parents('tr')).index();
+        console.log('clicked at ===>', data);
+        showEditModal(Number(data));
+
+        //removeItemFromtable(data);
+      });
+      // $(document).on('keypress', function (e) {
+      //   //alert(e.keyCode);
+      //   if (e.which) {
+      //     alert(e.which);
+      //   }
+      // });
+      $("#exampleModal").on('hidden.bs.modal', function () {
+        $("#pNameInput").val('');
+        $("#pBarcodeInput").val('');
+        $("#pPrice").val('');
+        $('#pQuantity').val('');
+      });
+      $('#checkOutModal').on('shown.bs.modal', function (e) {
+        $('#recvMoney').focus();
+      });
+      $('#finishModal').on('shown.bs.modal', function (e) {
+        $('#finishModal').unbind('keypress');
+        $('#finishModal').on('keypress', function (e) {
+          if (e.which == 13) {
+            location.reload();
+            //alert('Enter press!!!!!!')
+          } else if (e.which == 80) {
+            printJson();
+          }
+        });
+      });
+      $('#checkOutModal').on('hidden.bs.modal', function (e) {
+        $("#moneyChange").text('0.0');
+      });
+
+      $('#checkOutBtn').click(function () {
+        // $('#checkOutModal').modal('show');
+        checkOutFunc();
+      });
+
+      /////////// QUANTITY BUTTON ON MODAL ////////////
+      $('#quantityModalPlus').click(function () {
+        var currentVal = $('#pQuantity').val();
+        if (Number(currentVal) < 999) {
+          $('#pQuantity').val(Number(currentVal) + 1)
+        }
+      });
+      $('#quantityModalMinus').click(function () {
+        var currentVal = $('#pQuantity').val();
+        if (Number(currentVal) > 1) {
+          $('#pQuantity').val(Number(currentVal) - 1)
+        }
+
+      });
+      /////////// QUANTITY BUTTON ON MODAL ////////////
+      /////////// QUANTITY BUTTON ON POS PAGE ////////////
+      $('#addQuantityPlus').click(function () {
+        var currentVal = $('#quantityInput').val();
+        if (Number(currentVal) < 999) {
+          $('#quantityInput').val(Number(currentVal) + 1);
+        }
+        $('#barcodeInput').focus();
+      });
+      $('#addQuantityMinus').click(function () {
+        var currentVal = $('#quantityInput').val();
+        if (Number(currentVal) > 1) {
+          $('#quantityInput').val(Number(currentVal) - 1)
+        }
+        $('#barcodeInput').focus();
+      });
+      // ///////////////////////
+      $('#customAddPlus').click(function () {
+        var currentVal = $('#customQuantity').val();
+        if (Number(currentVal) < 999) {
+          $('#customQuantity').val(Number(currentVal) + 1);
+        }
+        $('#barcodeInput').focus();
+      });
+      $('#customAddMinus').click(function () {
+        var currentVal = $('#customQuantity').val();
+        if (Number(currentVal) > 1) {
+          $('#customQuantity').val(Number(currentVal) - 1)
+        }
+        $('#barcodeInput').focus();
+      });
+
+      /////////// QUANTITY BUTTON ON POS PAGE ////////////
+
+      $('#addCustomProductBtn').click(function () {
+        addCustomProduct();
+        $('#customQuantity').val('1');
+      });
+      $('#barcodeInput').keypress(function (e) {
+        if (e.which == 13) {
+          if ($("#barcodeInput").val().length > 0) {
+            getProduct($("#barcodeInput").val().toString());
+            $("#barcodeInput").val('');
+          } else {
+            alert('the barcode input must not be empty')
+          }
+          return false; //<---- Add this line
+        }
+      });
+    });
+  </script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <span class="badge badge-success text-light"><a class="navbar-brand ml-2 text-light" href="#">PrakobPOS</a></span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <!-- <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li> -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            เมนูอื่นๆ
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="iv/?token=98766543">จัดการสินค้าในคลัง</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+  <!-- MODALLLL -->
+  <div class="modal" id="modalNotfound" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="card bg-danger border-0 text-light" style="width: 100%; height: 200px;">
+                <h3 class="modal-title mx-auto text-light" style="margin-top: 90px !important;">ไม่พบข้อมูล</h3>
+            </div>
+            <div class="modal-footer mx-auto">
+                <button type="button" id="modal1close" class="btn btn-secondary mx-auto" style="width: 100px;"
+                    data-dismiss="modal">ปิด</button>
+            </div>
+        </div>
+    </div>
+</div>
+  <div class="modal fade bd-example-modal-lg" id="finishModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">ทำรายการสำเร็จ</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="card bg-light mt-3">
+
+            <div class="table-wrapper-scroll-y my-custom-scrollbar">
+              <table class="table table-bordered table-striped mb-0" id="finishTable">
+                <thead>
+                  <tr>
+                    <th>บาร์โค๊ด</th>
+                    <th>สินค้า</th>
+                    <th>จำนวน</th>
+                    <th>ราคา</th>
+                    <th>ราคารวม</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row mt-3" style="height: 100px !important;">
+            <div class="col-sm-4" style="height: 100%;">
+              <div class="card bg-info border-0 text-light" style="height: 100%;">
+                <h4 class="mt-2 ml-2"><span class="badge badge-pill badge-light">ราคารวม</span></h4>
+                <h1 style="text-align: right;" class="mr-3" id="finishTotalPrice">0.0</h1>
+              </div>
+            </div>
+            <div class="col-sm-4" style="height: 100%;">
+              <div class="card bg-info border-0 text-light" style="height: 100%;">
+                <h4 class="mt-2 ml-2"><span class="badge badge-pill badge-light">รับเงินมา</span></h4>
+                <h1 style="text-align: right;" class="mr-3" id="finishRecv">0.0</h1>
+              </div>
+            </div>
+            <div class="col-sm-4" style="height: 100%;">
+              <div class="card bg-success border-0 text-light" style="height: 100%;">
+                <h4 class="mt-2 ml-2"><span class="badge badge-pill badge-light">เงินทอน</span></h4>
+                <h1 style="text-align: right;" class="mr-3" id="finishChange">0.0</h1>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+
+          <button type="button" class="btn btn-primary" id="printBtn" onclick="printJson()">พิมพ์ใบเสร็จ(P)</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">เสร็จสิ้น(Enter)</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">ปิด(ESC)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODALLLLLLLL -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Product List Edit</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="card border-0">
+            <div class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">ชื่อสินค้า</span>
+              </div>
+              <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+                id="pNameInput">
+
+            </div>
+            <div class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">บาร์โค๊ด</span>
+              </div>
+              <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+                id="pBarcodeInput">
+
+            </div>
+            <div class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">ราคาขาย</span>
+              </div>
+              <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+                id="pPrice">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button">+</button>
+                <button class="btn btn-outline-secondary" type="button">-</button>
+              </div>
+            </div>
+            <div class="input-group mt-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">จำนวน</span>
+              </div>
+              <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"
+                id="pQuantity">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="quantityModalPlus">+</button>
+                <button class="btn btn-outline-secondary" type="button" id="quantityModalMinus">-</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-danger mt-2" id="listRemove">ลบสินค้านี้</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+          <button type="button" class="btn btn-primary" id="modalSaveBtn">บันทึก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade bd-example-modal-lg" id="checkOutModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content" style="width: 100%;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="exampleModalLabel">คำนวนเงินทอน</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" style="width: 100%;">
+          <div class="card border-0" style="width: 80%;">
+            <div class="card-header bg-info text-light">
+              <div class="row">
+                <div class="col-sm-9">
+                  <h3>ราคารวม</h3>
+                </div>
+                <div class="col-sm-3">
+                  <h2 id="checkOutTotal">0.0</h2>
+                </div>
+              </div>
+            </div>
+            <div class="card-header mt-3">
+              <div class="row">
+                <div class="col">
+                  <h3>รับเงินมา</h3>
+                </div>
+                <div class="col">
+                  <input type="number" class="form-control" placeholder="Recieve money" aria-label="Recieve mone"
+                    aria-describedby="basic-addon2" value="" id="recvMoney">
+                </div>
+              </div>
+              <div class="row mt-1">
+                <div class="col">
+                  <button type="button" class="btn btn-secondary" style="width: 100%;">20</button>
+                </div>
+                <div class="col">
+                  <button type="button" class="btn btn-secondary" style="width: 100%;">50</button>
+                </div>
+                <div class="col">
+                  <button type="button" class="btn btn-secondary" style="width: 100%;">100</button>
+                </div>
+                <div class="col">
+                  <button type="button" class="btn btn-secondary" style="width: 100%;">500</button>
+                </div>
+                <div class="col">
+                  <button type="button" class="btn btn-secondary" style="width: 100%;">1000</button>
+                </div>
+              </div>
+            </div>
+            <div class="card-header bg-info text-light mt-3" id="changeCard">
+              <div class="row">
+                <div class="col-sm-9">
+                  <h3>เงินทอน</h3>
+                </div>
+                <div class="col-sm-3">
+                  <h2 id="moneyChange">0.0</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="row" style="width: 100%; height: 100px;">
+            <div class="col-sm-4">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                style="width: 100%; height: 100%; font-size: 30px;">Close</button>
+            </div>
+            <div class="col-sm-8">
+              <button type="button" class="btn btn-primary" id="modalSaveBtn2"
+                style="width: 100%; height: 100%; font-size: 30px;">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Page Content -->
+
+
+  <div class="card background-card" style="height: 1024px !important;">
+    <div class="row mt-3 background-card">
+      <div class="col-sm-9">
+        <div class="card background-card ml-2">
+          <!-- left bottom card -->
+          <div class="card-header" style="height: 180px;">
+            <div class="row h-100">
+              <div class="col-md-2 h-100">
+                <!-- <h2><span class="badge badge-secondary">Product List</span></h2> -->
+              </div>
+              <div class="col-md-10 h-100">
+                <div class="row h-100 ml-3">
+                  <div class="col-md-3">
+                    <!-- <div class="card h-100 bg-info text-light">
+                          <div class="card-header">
+                            Total price
+                          </div>
+                        </div> -->
+                  </div>
+                  <div class="col-md-5 h-100">
+                    <!-- <div class="card h-100 bg-secondary text-light">
+                      <div class="card-header">
+                        <div class="row">
+                          <div class="col-sm-7">
+                            <h5 class="mx-auto">Type of product</h5>
+                          </div>
+                          <div class="col-sm-5">
+                            <h5>0</h5>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="card-body">
+                          <div class="row">
+                              <div class="col-sm-7">
+                                <h5 class="mx-auto">Quantity</h5>
+                              </div>
+                              <div class="col-sm-5">
+                                <h5>0</h5>
+                              </div>
+                            </div>
+                      </div>
+                    </div> -->
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card h-100 bg-info text-light">
+                      <div class="card-header text-center">
+                        <h4 class="mx-auto">ราคารวม</h4>
+                      </div>
+                      <div class="card-body text-center">
+                        <h1 class="card-title" id="totalPriceCard">0.00</h1>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="card-header">
+            <table id="example" class="table table-striped table-bordered nowrap" style="width:100%">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>บาร์โค๊ด</th>
+                  <th>สินค้า</th>
+                  <th>จำนวน</th>
+                  <th>ราคา</th>
+                  <th>โปรโมชั่น</th>
+                  <th>ราคารวม</th>
+                  <th>แก้ไข</th>
+                </tr>
+              </thead>
+              <tbody>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <div class="card">
+          <div class="card-header background-card">
+            <button class="btn btn-info mb-2" type="button" style="width: 100%;">
+              เพิ่มสินค้าในรายการ<i class="fa fa-plus-circle fa-lg ml-1"></i>
+            </button>
+            <h4><span class="badge badge-secondary">บาร์โค๊ด</span></h4>
+            <div class="input-group input-group-lg">
+
+              <input type="text" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm"
+                placeholder="Barcode" id="barcodeInput">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button" id="barcodeOk">OK</button>
+              </div>
+            </div>
+            <h4><span class="badge badge-secondary mt-2">ชื่อสินค้า</span></h4>
+            <div class="input-group input-group-lg">
+
+              <input type="text" class="form-control" aria-label="Large" aria-describedby="inputGroup-sizing-sm"
+                placeholder="Product name">
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button">OK</button>
+              </div>
+            </div>
+            <h4><span class="badge badge-secondary mt-2">จำนวน</span></h4>
+            <div class="input-group input-group-lg">
+              <input type="number" class="form-control" placeholder="Quantity" aria-label="Recipient's username"
+                aria-describedby="basic-addon2" value="1" id="quantityInput">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="addQuantityPlus">+</button>
+                <button class="btn btn-outline-secondary" type="button" id="addQuantityMinus">-</button>
+              </div>
+            </div>
+
+          </div>
+          <div class="card-header">
+            <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseExample"
+              aria-expanded="false" aria-controls="collapseExample" style="width: 100%;">
+              สินค้าขายดี<i class="fas fa-sort-down fa-lg ml-1"></i>
+            </button>
+
+            <div class="collapse" id="collapseExample">
+              <div class="card card-body">
+                <div class="row" style="height: 80px;">
+                  <div class="col-md-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">1</button>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">2</button>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">3</button>
+                  </div>
+                </div>
+                <div class="row mt-2" style="height: 80px;">
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">4</button>
+                  </div>
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">5</button>
+                  </div>
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">6</button>
+                  </div>
+                </div>
+                <div class="row mt-2" style="height: 80px;">
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">7</button>
+                  </div>
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">8</button>
+                  </div>
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">9</button>
+                  </div>
+                </div>
+                <div class="row mt-2" style="height: 80px;">
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">10</button>
+                  </div>
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">11</button>
+                  </div>
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-outline-secondary"
+                      style="width: 100%; height: 100%;">12</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-header background-card ">
+            <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseExample2"
+              aria-expanded="false" aria-controls="collapseExample2" style="width: 100%;">
+              สินค้ากำหนดเอง<i class="fas fa-sort-down fa-lg ml-1"></i>
+            </button>
+
+            <div class="collapse" id="collapseExample2">
+              <!-- custom input card -->
+              <div class="card mt-3 badge-secondary bg-light border-0">
+                <div class="input-group mb-3">
+
+                  <input type="text" class="form-control" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default" id="customPname">
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="inputGroup-sizing-default">ชื่อสินค้า</span>
+                  </div>
+                </div>
+                <div class="input-group mb-3">
+
+                  <input type="number" class="form-control" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default" id="customPrice">
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="inputGroup-sizing-default">ราคา</span>
+                  </div>
+                </div>
+                <div class="input-group mb-3">
+
+                  <input type="number" class="form-control" placeholder="Quantity" aria-label="Recipient's username"
+                    aria-describedby="basic-addon2" value="1" id="customQuantity">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="customAddPlus">+</button>
+                    <button class="btn btn-outline-secondary" type="button" id="customAddMinus">-</button>
+                  </div>
+                </div>
+                <button class="btn btn-success" type="button" id="addCustomProductBtn">
+                  <--เพิ่ม</button> </div> <!-- custom input card -->
+              </div>
+            </div>
+            <div class="card-header" style="height: 150px;">
+              <button class="btn btn-primary mx-auto" style="height: 100%; width: 100%; font-size: 60px;" type="button"
+                id="checkOutBtn">คิดเงิน</button>
+
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- /#page-content-wrapper -->
+
+    <!-- /#wrapper -->
+
+    <!-- Bootstrap core JavaScript -->
+
+
+    <!-- Menu Toggle Script -->
+    <script>
+      $("#menu-toggle").click(function (e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+      });
+      $("#barcodeOk").click(function (e) {
+        console.log('clecked!!!')
+        if ($("#barcodeInput").val().length > 0) {
+          getProduct($("#barcodeInput").val().toString());
+          $("#barcodeInput").val('');
+        } else {
+          alert('the barcode input must not be empty')
+        }
+
+        //e.preventDefault();
+        //console.log($("#barcodeInput").val());
+        // if($("#barcodeInput").val().lenght > 1){
+        //   getProduct($("#barcodeInput").val());
+        // }
+
+      });
+    </script>
+
+</body>
+
+</html>

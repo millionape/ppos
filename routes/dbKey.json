@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "minimartpos",
+  "private_key_id": "8314d6327c8bf8a1b9fff3a19c7f3b35d5e14764",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCv6YeqMFjMcMRu\nakFXyqbyn72+8VBcg+kJrQcK4+lcGiLLl0+1Iy0WS4Ki9xb/+YW0nqiuHzEXxoFt\n4Mu+iDxfFDlx1/jIN0o2M0OhuMM2vTedal75nQN4PO3mBZORWAVZNN+9DmGxgBFX\nYwq7xTmZiir1Y9LKwBzoZe9pDcgDmFx7e9l8MQcFJbMM/fKI956gAOZAc7gT4lLp\nNVIIVq2tLedXJWHq2VpmQiSnbrasn1byk7qdxS51tTxRgu2APajKrM3b1N5f3iOo\npkkYWBKIIBN3SgK32oxwSEb3GcBP5uSyNK9N89Wvfej0B7lngOQ4aqmiwXONx6TL\n5wGwrsl5AgMBAAECggEAC0WAJRpEclMObxG9Xpn0UQsFvjCZqNfl7HILB7pbR0TA\ncoGfQJjAqJNNi1IgReYP2GcrIT8L5v1X6Tm0bGCv15rE5IPFY9TRG0B1Jq1fSshc\ngihg7gcOxBtJVgoI7tDwRMtDw8oiXdx6H/qPY0Ero+grwP30sXuWTpjLepSAuqQj\nIpo9CkYRjTx4/ZqHusjB+N5U2SLIeXLSKTp1w3wfes0MlcU9/8YIspR2qlgqPI0D\nB8D9u/t0h0wiTDEhA7eM8ASul/++93aPN99BObbZ8qS841MikJzLlcjzZBUVBq0l\nMtfXFLdRMwLk20TZRnJsDq5hS4xSYi48QFoc/AD2hQKBgQDZyuTFGGh7dv65dCp0\n4WWt2ZycOMobRpw/D03nXXjgV3kpgmt0aur7OL3DitfJWr9k0CmmRMfYWb7WE5Li\netBJce3Q9l7r7ro9TpbFdcsraNLSaOC2OkE/INc8RAJdYHsblV0C4ul8t7M1qWHX\nLEoSXs+2zk1DAgN5/74/myqizQKBgQDOxchYMgfduv0/PiwoJlBAkXUGj5J4YJ6D\naTS728/EeCId2AdhX+xkaegZrKf2GcIZcIWyUf9sd6QvQ4FKaso5rrJsMGEN0SP6\n7lr7FEHoeqDwhR7idd1yZs214eXFYApMNwIzNFjrSkzGByJGzXvE1+MKABTJSg5N\nevL7t7o5XQKBgQCFsGLvjYUNTMUdx+4L4xQMPIlC6CU/yv88QkO64wjBBVDtpw4Y\n30ywu2rY7pB5HEhiNNlsI8pcxvI67Lb8aREUFGg8Hg+0Wc1etrAcM6tsUSMgX5qY\noXfNrXYRm1msQf4vt2bpz6otkYHjTb8uWxR45FQyzb5lhIXnzJHW74OjfQKBgCcg\nM73Ekcp6JIuABzj9rvfYzk0Ug8G1fqkdEjZt7I2fscz14MejMAb8J0gcbJfb3eeU\nbCgG7g8nQHEVE/Tx6hwqG2bvbJ4Bsg48ZgjWl3YXJjb86ZAuf12zaD9/ZEwJ1UkA\nq7DmueCj6Y0bMng1T7M6qqJsy4IfOj+dATdyV5GdAoGALS4P9uUs/iu7FV4fK9+q\nonNO0VP6TQmckPLGRCIy1xL5+W/lTUnIGvPI1Mi/WjItbZv9AaxhmVAC0D8tLPpF\njmVLevDdHdu7vJY++8w310xXpn+PfUmh1smEQTjhprfbvQjJ6ShMKmx+vTKUuDgE\nAtHKNkfgxs1ZQHiM4smYToA=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-vml6r@minimartpos.iam.gserviceaccount.com",
+  "client_id": "113963040035970172500",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-vml6r%40minimartpos.iam.gserviceaccount.com"
+}

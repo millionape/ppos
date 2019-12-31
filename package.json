@@ -1,0 +1,33 @@
+{
+  "name": "gpfweb",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "aws-iot-device-sdk": "^2.2.1",
+    "aws4": "^1.8.0",
+    "bootstrap-input-spinner": "^1.11.17",
+    "bootstrap-waitingfor": "^1.2.7",
+    "chart.js": "^2.8.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "firebase-admin": "^8.7.0",
+    "http-errors": "~1.6.3",
+    "md5": "^2.2.1",
+    "moment": "^2.24.0",
+    "morgan": "~1.9.1",
+    "mqtt": "^3.0.0",
+    "mysql": "^2.17.1",
+    "nodemon": "^1.19.2",
+    "print-js": "^1.0.61",
+    "request": "^2.88.0",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "firebase": "^7.3.0"
+  }
+}
