@@ -291,7 +291,7 @@ function getProduct(bar) {
                 total += (price * quantity);
                 console.log(total);
             }
-            $('#totalPriceCard').text(total.toFixed(3));
+            $('#totalPriceCard').text(total.toFixed(2));
             $('#quantityInput').val('1');
             $('#barcodeInput').focus();
         }
