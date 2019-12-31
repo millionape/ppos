@@ -37,12 +37,14 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
 
     <script type="text/javascript" src="../public/stylesheets/js/getProduct.js"></script>
+    <script type="text/javascript" src="../public/stylesheets/js/intervalWake.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="../public/stylesheets/js/76c4acf77c.js" crossorigin="anonymous"></script>
     <script src="../public/stylesheets/js/backShopJs.js"></script>
     <script>
         $(document).ready(function () {
+            set_interval();
             $("#ivBarInput").focus();
             var table = $('#example').DataTable({
                 "paging": true,

@@ -16,6 +16,7 @@
   <script src="../node_modules/print-js/dist/print.js"></script>
   <link rel="stylesheet" type="text/css" href="../node_modules/print-js/dist/print.css">
   <script src="../node_modules/moment/min/moment-with-locales.min.js"></script>
+  <script type="text/javascript" src="../public/stylesheets/js/intervalWake.js"></script>
 
 
 
@@ -67,6 +68,7 @@
     //$("#wrapper").toggleClass("hide");
 
     $(document).ready(function () {
+      set_interval();
       $("#barcodeInput").focus();
       var table = $('#example').DataTable({
         responsive: true,

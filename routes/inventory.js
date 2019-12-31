@@ -159,6 +159,9 @@ router.get('/findbybarcode', function (req, res, next) {
         })
     }
 });
+router.get('/intervalTest', function (req, res, next) {
+    res.json({status:"HELLO FROM INTERVAL TASK"});
+});
 
 router.get('/findbyname', function (req, res, next) {
     const pname = req.query.pname
