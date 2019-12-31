@@ -250,7 +250,8 @@ function getProduct(bar) {
                     productName: res.product_NAME,
                     quantity: Number($('#quantityInput').val()),
                     price: Number(res.price),
-                    promotion: '--'
+                    promotion: '--',
+                    dateTime: moment().format().toString()
 
                 }
                 for (let i of tmpArray) {
@@ -273,6 +274,11 @@ function getProduct(bar) {
                     }
                 }
                 tmpArray.push(tmpStructure);
+                tmpArray = tmpArray.sort(function (obj1, obj2) {
+                    var dateA = new Date(obj1.dateTime),
+                        dateB = new Date(obj2.dateTime);
+                    return dateB-dateA;
+                });
                 drawTable(tmpArray);
                 console.log(tmpArray)
 
@@ -285,7 +291,7 @@ function getProduct(bar) {
                 total += (price * quantity);
                 console.log(total);
             }
-            $('#totalPriceCard').text(total);
+            $('#totalPriceCard').text(total.toFixed(3));
             $('#quantityInput').val('1');
             $('#barcodeInput').focus();
         }
