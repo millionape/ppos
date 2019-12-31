@@ -163,7 +163,7 @@ function showEditModal(index) {
             total += (price * quantity);
             //console.log(total);
         }
-        $('#totalPriceCard').text(total);
+        $('#totalPriceCard').text(total.toFixed(2));
         $('#modalSaveBtn').unbind('click');
         // $('#exampleModal').modal('hide');
     });
@@ -179,7 +179,7 @@ function showEditModal(index) {
             total += (price * quantity);
             //console.log(total);
         }
-        $('#totalPriceCard').text(total);
+        $('#totalPriceCard').text(total.toFixed(2));
         $('#listRemove').unbind('click');
         $('#barcodeInput').focus();
     })
@@ -205,7 +205,7 @@ function addCustomProduct() {
         total += (price * quantity);
         console.log(total);
     }
-    $('#totalPriceCard').text(total);
+    $('#totalPriceCard').text(total.toFixed(2));
     $('#customPname').val('');
     $('#customPrice').val('');
     $('#barcodeInput').focus();
@@ -220,7 +220,7 @@ function displayTotalPrice() {
         total += (price * quantity);
         console.log(total);
     }
-    $('#totalPriceCard').text(total);
+    $('#totalPriceCard').text(total.toFixed(2));
     $('#barcodeInput').focus();
 }
 
@@ -267,7 +267,7 @@ function getProduct(bar) {
                             total += (price * quantity);
                             console.log(total);
                         }
-                        $('#totalPriceCard').text(total);
+                        $('#totalPriceCard').text(total.toFixed(2));
                         $('#barcodeInput').focus();
                         $('#quantityInput').val('1');
                         return;
