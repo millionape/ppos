@@ -9,7 +9,7 @@ const bodyParser = require('body-parser')
 var indexRouter = require('./routes/index');
 var posRouter = require('./routes/pos');
 var inventoryRouter = require('./routes/inventory');
-
+var barcodeRouter = require('./routes/barcode');
 //////////////////////
 var app = express();
 
@@ -31,6 +31,7 @@ app.use(express.static(path.join(__dirname, '')));
 app.use('/', indexRouter); ///// index
 app.use('/pos', posRouter); /// pos
 app.use('/iv', inventoryRouter); /// pos
+app.use('/barcode', barcodeRouter); /// pos
 
 //////////////////////
 app.use(

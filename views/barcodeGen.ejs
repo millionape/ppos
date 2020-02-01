@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Prakob POS</title>
+
+    <link href="../public/stylesheets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="../public/stylesheets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../node_modules/print-js/dist/print.js"></script>
+    <link rel="stylesheet" type="text/css" href="../node_modules/print-js/dist/print.css">
+    <script src="../node_modules/moment/min/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="../public/stylesheets/js/intervalWake.js"></script>
+
+
+
+    <!--Data Table-->
+    <script type="text/javascript" src=" https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src=" https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js">
+    </script>
+
+    <!--Export table buttons-->
+    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+  <script type="text/javascript" src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/pdfmake.min.js"></script>
+  <script type="text/javascript" src="https://cdn.rawgit.com/bpampuch/pdfmake/0.1.24/build/vfs_fonts.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.html5.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.2.1/js/buttons.print.min.js"></script> -->
+
+    <!--Export table button CSS-->
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
+    <script type="text/javascript" src="../node_modules/moment/min/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="../public/stylesheets/js/getProduct.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="../public/stylesheets/js/76c4acf77c.js" crossorigin="anonymous"></script>
+
+    <script>
+        function keyupListenner(inputText, appendBtn, limit) {
+            console.log(inputText.val());
+            if (inputText.val().length === limit) {
+                appendBtn.removeClass('btn-danger');
+                appendBtn.addClass('btn-success');
+                appendBtn.text('OK');
+                var arr = ['bar1', 'bar2', 'bar3', 'bar4', ];
+                if (inputText.attr('id') === 'bar1') {
+                    $('#bar2').focus();
+                }
+                if (inputText.attr('id') === 'bar2') {
+                    $('#bar3').focus();
+                }
+                if (inputText.attr('id') === 'bar3') {
+                    $('#bar4').focus();
+                }
+
+
+
+            } else {
+                appendBtn.removeClass('btn-success');
+                appendBtn.addClass('btn-danger');
+                appendBtn.text('X');
+            }
+        }
+        $('#myCollapsible').on('shown.bs.collapse', function () {
+            // do something…
+
+        })
+
+        function myFunction() {
+            /* Get the text field */
+            var copyText = document.getElementById("final_bar");
+
+            /* Select the text field */
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+
+            /* Copy the text inside the text field */
+            document.execCommand("copy");
+
+            /* Alert the copied text */
+            $('#collapseExample').collapse('show');
+            setTimeout(function () {
+                $('#collapseExample').collapse('hide');
+            }, 3000);
+
+        }
+        $(document).ready(function () {
+            console.log("ready!");
+            $('#bar1').on('keyup', function () {
+                keyupListenner($("#bar1"), $("#b1"), 15);
+            });
+            $('#bar2').on('keyup', function () {
+                keyupListenner($("#bar2"), $("#b2"), 12);
+            });
+            $('#bar3').on('keyup', function () {
+                keyupListenner($("#bar3"), $("#b3"), 6);
+            });
+            $('#bar4').on('keyup', function (e) {
+                if (e.keyCode == 13) {
+                    //$(this).trigger("enterKey");
+                    $('#genButton').click();
+                }else{
+                    keyupListenner($("#bar4"), $("#b4"), 6);
+                }
+                
+            });
+            $('#genButton').click(function () {
+                if ($("#b1").text() === 'OK' && $("#b2").text() === 'OK' && $("#b3").text() === 'OK' &&
+                    $("#b4").text() === 'OK') {
+                    var bar =
+                        `|${$('#bar1').val()} ${$('#bar2').val()} ${$('#bar3').val()} ${$('#bar4').val()}\r`;
+                    $('#exampleModalCenter').modal('show');
+                    $('#final_bar').val(bar);
+                } else {
+                    alert('กรุณาตรวจสอบชุดตัวเลขอีกครั้ง');
+                }
+
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <span class="badge badge-success text-light"><a class="navbar-brand ml-2 text-light"
+                href="/pos?token=f6fdffe48c908deb0f4c3bd36c032e72">PrakobPOS</a></span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <!-- <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li> -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        เมนูอื่นๆ
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="iv/?token=98766543">จัดการสินค้าในคลัง</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">สร้างบาร์โค๊ดสำหรับบิลค่าไฟสำเร็จ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- <h5 id="final_bar"></h5> -->
+                    <div class="input-group mb-3">
+                        <input type="text" id="final_bar" class="form-control" placeholder="Recipient's username"
+                            aria-label="Recipient's username" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary" onclick="myFunction()" type="button">COPPY</button>
+                        </div>
+                    </div>
+                    <div class="collapse" id="collapseExample">
+                        <div class="card card-body badge-success">
+                            คัดลอกบาร์โค๊ดแล้ว!
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="row mr-3 ml-3">
+            <div class="col-md-6">
+                <div class="card text-white bg-secondary ">
+                    <h5 class="card-header">สร้างบาร์โค๊ด</h5>
+                    <div class="card-body">
+                        <h5 class="card-title">สำหรับสร้างบาร์โค๊ดบิลค่าไฟ</h5>
+                        <p class="card-text">พิมพ์เลขที่เห็นในบิลค่าไฟทั้งหมด 4 ชุด โดยไม่ต้องใส่อักษรพิเศษ</p>
+                        <br>
+                        <br>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">เลขชุดที่ 1</span>
+                            </div>
+                            <input type="number" id="bar1" class="form-control" aria-label="Default"
+                                aria-describedby="inputGroup-sizing-default" maxlength="15">
+                            <div class="input-group-append">
+                                <button class="btn btn-danger" id="b1" type="button">X</button>
+                            </div>
+
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">เลขชุดที่ 2</span>
+                            </div>
+                            <input type="number" id="bar2" class="form-control" aria-label="Default"
+                                aria-describedby="inputGroup-sizing-default" maxlength="12">
+                            <div class="input-group-append">
+                                <button class="btn btn-danger" id="b2" type="button">X</button>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">เลขชุดที่ 3</span>
+                            </div>
+                            <input type="number" id="bar3" class="form-control" aria-label="Default"
+                                aria-describedby="inputGroup-sizing-default" maxlength="6">
+                            <div class="input-group-append">
+                                <button class="btn btn-danger" id="b3" type="button">X</button>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">เลขชุดที่ 4</span>
+                            </div>
+                            <input type="number" id="bar4" class="form-control" aria-label="Default"
+                                aria-describedby="inputGroup-sizing-default" maxlength="6">
+                            <div class="input-group-append">
+                                <button class="btn btn-danger" id="b4" type="button">X</button>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <a href="#" class="btn btn-primary mx-auto" id="genButton">สร้างบาร์โค๊ด</a>
+                    <br>
+                    <br>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card w-100" style="width: 18rem;">
+                    <img class="card-img-top w-100" src="/public/stylesheets/img/ex-bar.jpg" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">ตัวอย่างการอ่าน Barcode จากบิลค่าไฟ</h5>
+                        <p class="card-text">*** ไม่ต้องใส่อักษรพิเศษ ใส่แค่ตัวเลขเท่านั้น ***</p>
+                        <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODALLLL -->
+
+
+</body>
+
+</html>
