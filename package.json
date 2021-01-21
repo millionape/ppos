@@ -25,7 +25,7 @@
     "nodemon": "^1.19.4",
     "print-js": "^1.0.61",
     "request": "^2.88.0",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.0"
   },
   "devDependencies": {
     "firebase": "^7.3.0"
